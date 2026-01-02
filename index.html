@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Snowdon Via The Llanberis Path 3D Flyover</title>
+<title>Cwm Idwal Hike 3D Flyover</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
 
@@ -401,12 +401,9 @@ body.fake-fullscreen #btnMobileMenu{
 mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
 /* redirect only */
-const GPX_URL="https://raw.githubusercontent.com/remmiagbebi-beep/aberglaslyn-llyn-dinas-flyover/main/Aberglaslyn,%20Llyn%20Dinas%20%26%20Beddgelert.gpx";
+const GPX_URL="https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/Cwm%20Idwal%20Hike.gpx";
 
-/* starting view turned by 180 degrees */
-const START_VIEW_OFFSET_DEG = 180;
-
-/* follow camera offset (your existing behaviour) */
+/* camera behind walker */
 const BEARING_OFFSET_DEG = 180;
 
 const START_ZOOM=15.7,
@@ -441,7 +438,7 @@ function normBearing(b){
 /* FAST FORWARD ICON (redirect only) */
 (async()=>{
   try{
-    const r=await fetch("https://raw.githubusercontent.com/remmiagbebi-beep/aberglaslyn-llyn-dinas-flyover/main/icons/fast-forward.svg");
+    const r=await fetch("https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/icons/fast-forward.svg");
     const t=await r.text();
     const svg=new DOMParser().parseFromString(t,"image/svg+xml").querySelector("svg");
     if(svg){
@@ -458,7 +455,7 @@ function normBearing(b){
 /* LAYERS ICON (redirect only) */
 (async()=>{
   try{
-    const r=await fetch("https://raw.githubusercontent.com/remmiagbebi-beep/aberglaslyn-llyn-dinas-flyover/main/icons/layers.svg");
+    const r=await fetch("https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/icons/layers.svg");
     const t=await r.text();
     const svg=new DOMParser().parseFromString(t,"image/svg+xml").querySelector("svg");
     if(svg){
@@ -532,7 +529,9 @@ function isIOS(){
 
   let initialCenter = [-4.128, 53.118];
   let initialZoom = 13.5;
-  let initialBearing = -20;
+
+  /* key: always start behind the first segment */
+  let initialBearing = 0;
 
   if(line){
     const b = turf.bbox(line);
@@ -655,7 +654,7 @@ function isIOS(){
         let fitBearing = initialBearing;
         if(pts.length >= 2){
           const fwd = turf.bearing(turf.point(pts[0]), turf.point(pts[1]));
-          fitBearing = normBearing(fwd + BEARING_OFFSET_DEG + START_VIEW_OFFSET_DEG);
+          fitBearing = normBearing(fwd + BEARING_OFFSET_DEG);
         }
 
         map.fitBounds([[b[0],b[1]],[b[2],b[3]]],{
@@ -800,9 +799,7 @@ function tick(ts){
       const targetCenter=pos;
 
       const fwd = turf.bearing(turf.point(pos),turf.point(nxt));
-
-      /* CHANGE: keep the same 180 rotated start angle during playback */
-      const targetBearing = normBearing(fwd + BEARING_OFFSET_DEG + START_VIEW_OFFSET_DEG);
+      const targetBearing = normBearing(fwd + BEARING_OFFSET_DEG);
 
       const targetPitch=camMode==="topdown"?0:75;
 
