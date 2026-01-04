@@ -7,263 +7,59 @@
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
 
 <style>
-#iconResetView {
-  width: 40px !important;
-  height: 40px !important;
-}
-  
-html,body{
-  margin:0;
-  height:100%;
-  background:#000;
-  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  overflow:hidden;
-}
-#map{ position:absolute; inset:0 }
-
-.ui{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  z-index:10;
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-.ui-right{ right:20px; }
-.ui-left{ left:20px; }
-
-.btn{
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:3px solid #fff;
-  cursor:pointer;
-  background:linear-gradient(180deg,#EC2629,#b51d20);
-  box-shadow:0 3px 10px rgba(0,0,0,.35);
-  transition:.15s;
-}
-.btn:hover{
-  background:linear-gradient(180deg,#3899EC,#297fc8);
-}
-
-.btn svg{
-  fill:#fff;
-  width:24px;
-  height:24px;
-  display:none;
-}
-.btn svg.active{ display:block }
+#iconResetView{width:40px!important;height:40px!important}
+html,body{margin:0;height:100%;background:#000;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow:hidden}
+#map{position:absolute;inset:0}
+.ui{position:absolute;top:50%;transform:translateY(-50%);z-index:10;display:flex;flex-direction:column;gap:18px}
+.ui-right{right:20px}
+.ui-left{left:20px}
+.btn{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid #fff;cursor:pointer;background:linear-gradient(180deg,#EC2629,#b51d20);box-shadow:0 3px 10px rgba(0,0,0,.35);transition:.15s}
+.btn:hover{background:linear-gradient(180deg,#3899EC,#297fc8)}
+.btn svg{fill:#fff;width:24px;height:24px;display:none}
+.btn svg.active{display:block}
 
 /* base size for speed icon */
-#iconSpeed{
-  width:18px;
-  height:18px;
-}
+#iconSpeed{width:18px;height:18px}
 
-.speed-wrap{ position:relative; width:50px; height:50px }
-
-.speed-panel{
-  position:absolute;
-  top:50%;
-  right:60px;
-  transform:translateY(-50%) scale(.98);
-  opacity:0;
-  pointer-events:none;
-  width:230px;
-  height:45px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:0 10px;
-  border-radius:9999px;
-  border:3px solid #fff;
-  background:linear-gradient(180deg,#EC2629,#b51d20);
-  transition:opacity .18s,transform .18s;
-  box-shadow:0 3px 10px rgba(0,0,0,.35);
-}
-.speed-wrap.open .speed-panel{
-  opacity:1;
-  transform:translateY(-50%) scale(1);
-  pointer-events:auto;
-}
-
-.speed-slider{
-  flex:1;
-  appearance:none;
-  height:6px;
-  border-radius:999px;
-  background:linear-gradient(90deg,#fff,#fff8);
-  outline:none;
-}
-.speed-slider::-webkit-slider-thumb{
-  appearance:none;
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background:#fff;
-  border:2px solid #EC2629;
-  box-shadow:0 2px 8px rgba(0,0,0,.25);
-  cursor:pointer;
-}
+.speed-wrap{position:relative;width:50px;height:50px}
+.speed-panel{position:absolute;top:50%;right:60px;transform:translateY(-50%) scale(.98);opacity:0;pointer-events:none;width:230px;height:45px;display:flex;align-items:center;gap:12px;padding:0 10px;border-radius:9999px;border:3px solid #fff;background:linear-gradient(180deg,#EC2629,#b51d20);transition:opacity .18s,transform .18s;box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.speed-wrap.open .speed-panel{opacity:1;transform:translateY(-50%) scale(1);pointer-events:auto}
+.speed-slider{flex:1;appearance:none;height:6px;border-radius:999px;background:linear-gradient(90deg,#fff,#fff8);outline:none}
+.speed-slider::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #EC2629;box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:pointer}
 
 /* MOBILE MENU BUTTON – base style, visibility handled in JS */
-.mobile-menu-btn{
-  position:absolute;
-  bottom:20px;
-  right:20px;
-  z-index:20;
-  display:none;
-}
+.mobile-menu-btn{position:absolute;bottom:20px;right:20px;z-index:20;display:none}
 
 /* Hide all Mapbox branding */
-.mapboxgl-ctrl-logo,
-.mapboxgl-ctrl-attrib,
-.mapboxgl-ctrl-bottom-left,
-.mapboxgl-ctrl-bottom-right{
-  display:none !important;
-}
+.mapboxgl-ctrl-logo,.mapboxgl-ctrl-attrib,.mapboxgl-ctrl-bottom-left,.mapboxgl-ctrl-bottom-right{display:none!important}
 
 /* Fake fullscreen hook (desktop / android) */
-body.fake-fullscreen #map{
-  position:fixed;
-  inset:0;
-  z-index:1;
-}
-body.fake-fullscreen .ui,
-body.fake-fullscreen #btnMobileMenu{
-  z-index:2;
-}
+body.fake-fullscreen #map{position:fixed;inset:0;z-index:1}
+body.fake-fullscreen .ui,body.fake-fullscreen #btnMobileMenu{z-index:2}
 
 /* MOBILE LAYOUT + 85% BUTTON SIZE, NO WHITE BORDERS, BACKWARDS L ALIGNMENT */
-@media (max-width: 767px){
-
-  :root{
-    --btn-size:42px;
-    --gap:8px;
-    --menu-offset:20px;
-  }
-
-  /* all buttons 85% of desktop and NO border */
-  .btn{
-    width:var(--btn-size);
-    height:var(--btn-size);
-    border:none;
-  }
-  .btn svg{
-    width:20px;
-    height:20px;
-  }
-
-  /* speed icon 15% smaller on normal mobile (non fullscreen) */
-  body:not(.ios-fullscreen) #iconSpeed{
-    width:14px !important;
-    height:14px !important;
-  }
-
-  #iconResetView{
-    width:34px !important;
-    height:34px !important;
-  }
-
-  .speed-wrap{
-    width:var(--btn-size);
-    height:var(--btn-size);
-  }
-  .speed-panel{
-    height:36px;
-    right:50px;
-    width:185px;
-    border:none;
-    gap:9px;
-    padding:0 7px;
-  }
-  .speed-slider::-webkit-slider-thumb{
-    width:15px;
-    height:15px;
-  }
-
-  /* menu absolutely in bottom right */
-  .mobile-menu-btn{
-    position:absolute;
-    bottom:var(--menu-offset);
-    right:var(--menu-offset);
-    z-index:20;
-  }
-
-  #btnMobileMenu{
-    width:var(--btn-size);
-    height:var(--btn-size);
-    border:none;
-  }
-  #btnMobileMenu svg{
-    width:20px;
-    height:20px;
-  }
-
-  /* backwards L: all gaps = var(--gap), edges aligned to menu */
-  .ui-left,
-  .ui-right{
-    top:auto;
-    transform:none;
-    gap:var(--gap);
-  }
-
-  /* bottom row to the left of menu */
-  .ui-right{
-    bottom:var(--menu-offset);
-    right:calc(var(--menu-offset) + var(--btn-size) + var(--gap));
-    left:auto;
-    flex-direction:row-reverse;
-    align-items:flex-end;
-  }
-
-  /* vertical stack above menu */
-  .ui-left{
-    bottom:calc(var(--menu-offset) + var(--btn-size) + var(--gap));
-    right:var(--menu-offset);
-    left:auto;
-    flex-direction:column;
-    align-items:flex-end;
-  }
-
-  /* iOS FULLSCREEN TAB */
-  body.ios-fullscreen{
-    --btn-size:57px;
-  }
-
-  body.ios-fullscreen .btn svg{
-    width:27px;
-    height:27px;
-  }
-
-  body.ios-fullscreen #iconSpeed{
-    width:17px !important;
-    height:17px !important;
-  }
-
-  body.ios-fullscreen #iconResetView{
-    width:45px !important;
-    height:45px !important;
-  }
-  body.ios-fullscreen .speed-panel{
-    height:50px;
-    right:60px;
-    width:255px;
-    gap:14px;
-    padding:0 12px;
-  }
-  body.ios-fullscreen .speed-slider::-webkit-slider-thumb{
-    width:20px;
-    height:20px;
-  }
-
-  body.ios-fullscreen #btnFull{
-    display:none !important;
-  }
+@media (max-width:767px){
+  :root{--btn-size:42px;--gap:8px;--menu-offset:20px}
+  .btn{width:var(--btn-size);height:var(--btn-size);border:none}
+  .btn svg{width:20px;height:20px}
+  body:not(.ios-fullscreen) #iconSpeed{width:14px!important;height:14px!important}
+  #iconResetView{width:34px!important;height:34px!important}
+  .speed-wrap{width:var(--btn-size);height:var(--btn-size)}
+  .speed-panel{height:36px;right:50px;width:185px;border:none;gap:9px;padding:0 7px}
+  .speed-slider::-webkit-slider-thumb{width:15px;height:15px}
+  .mobile-menu-btn{position:absolute;bottom:var(--menu-offset);right:var(--menu-offset);z-index:20}
+  #btnMobileMenu{width:var(--btn-size);height:var(--btn-size);border:none}
+  #btnMobileMenu svg{width:20px;height:20px}
+  .ui-left,.ui-right{top:auto;transform:none;gap:var(--gap)}
+  .ui-right{bottom:var(--menu-offset);right:calc(var(--menu-offset) + var(--btn-size) + var(--gap));left:auto;flex-direction:row-reverse;align-items:flex-end}
+  .ui-left{bottom:calc(var(--menu-offset) + var(--btn-size) + var(--gap));right:var(--menu-offset);left:auto;flex-direction:column;align-items:flex-end}
+  body.ios-fullscreen{--btn-size:57px}
+  body.ios-fullscreen .btn svg{width:27px;height:27px}
+  body.ios-fullscreen #iconSpeed{width:17px!important;height:17px!important}
+  body.ios-fullscreen #iconResetView{width:45px!important;height:45px!important}
+  body.ios-fullscreen .speed-panel{height:50px;right:60px;width:255px;gap:14px;padding:0 12px}
+  body.ios-fullscreen .speed-slider::-webkit-slider-thumb{width:20px;height:20px}
+  body.ios-fullscreen #btnFull{display:none!important}
 }
 </style>
 </head>
@@ -273,31 +69,19 @@ body.fake-fullscreen #btnMobileMenu{
 
 <div class="ui ui-left">
   <button id="btnToggle" class="btn">
-    <svg id="iconPlay" class="active" viewBox="0 0 24 24">
-      <polygon transform="translate(1,0)" points="5,3 19,12 5,21"></polygon>
-    </svg>
-    <svg id="iconPause" viewBox="0 0 24 24">
-      <rect x="6" y="4" width="5" height="16" rx="1.5"></rect>
-      <rect x="13" y="4" width="5" height="16" rx="1.5"></rect>
-    </svg>
+    <svg id="iconPlay" class="active" viewBox="0 0 24 24"><polygon transform="translate(1,0)" points="5,3 19,12 5,21"></polygon></svg>
+    <svg id="iconPause" viewBox="0 0 24 24"><rect x="6" y="4" width="5" height="16" rx="1.5"></rect><rect x="13" y="4" width="5" height="16" rx="1.5"></rect></svg>
   </button>
 
   <button id="btnRestart" class="btn">
     <svg id="iconRestart" class="active" viewBox="0 0 24 24" style="transform:translateX(2px)">
-      <path d="M5 4v5h5" fill="none" stroke="#fff" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round"></path>
-      <path d="M5 9a7 7 0 1 1-1.5 4.3" fill="none" stroke="#fff" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M5 4v5h5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M5 9a7 7 0 1 1-1.5 4.3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
     </svg>
   </button>
 
   <button id="btnReset" class="btn">
-    <svg id="iconResetView"
-       class="active"
-       width="36"
-       height="36"
-       viewBox="0 0 512 512"
-       xmlns="http://www.w3.org/2000/svg">
+    <svg id="iconResetView" class="active" width="36" height="36" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
       <path fill="#ffffff" d="M307.81,212.18c-3.24,0-6.07-2.17-6.91-5.3l-4.82-17.88c-0.84-3.12-3.68-5.3-6.91-5.3h-21.46h-25.44H220.8
         c-3.24,0-6.07,2.17-6.91,5.3l-4.82,17.88c-0.84,3.12-3.68,5.3-6.91,5.3H169.5c-3.96,0-7.16,3.21-7.16,7.16v101.78
         c0,3.96,3.21,7.16,7.16,7.16h170.95c3.96,0,7.16-3.21,7.16-7.16V219.35c0-3.96-3.21-7.16-7.16-7.16H307.81z M282.33,264.94
@@ -320,13 +104,8 @@ body.fake-fullscreen #btnMobileMenu{
   </button>
 
   <button id="btnCam" class="btn">
-    <svg id="iconCamCine" class="active" viewBox="0 0 24 24">
-      <rect x="3" y="7" width="11" height="10" rx="2"></rect>
-      <polygon points="16,10 22,7.5 22,16.5 16,14"></polygon>
-    </svg>
-    <svg id="iconCamBird" xmlns="http://www.w3.org/2000/svg"
-         viewBox="4.3333375 6.3333375 43.875 40.375"
-         style="transform:translate(1px,1px)">
+    <svg id="iconCamCine" class="active" viewBox="0 0 24 24"><rect x="3" y="7" width="11" height="10" rx="2"></rect><polygon points="16,10 22,7.5 22,16.5 16,14"></polygon></svg>
+    <svg id="iconCamBird" xmlns="http://www.w3.org/2000/svg" viewBox="4.3333375 6.3333375 43.875 40.375" style="transform:translate(1px,1px)">
       <path fill="#fff" d="M41.965,20.694c-0.495-2.083-2.273-3.54-4.182-3.54c-1.816,0-3.717,1.149-5.184,2.522
         c-3.911-5.328-9.661-9.706-13.112-12.527c-0.713,1.656-1.029,3.449-1.029,5.271c0,1.999,0.395,4.832,1.042,6.768L26,19.667H5.121
         c2.5,5.762,7.472,9.976,13.329,12.333c-3.699,2.583-6.778,4.415-10.271,6.815c2.034,2.034,3.384,2.935,6.606,4.035
@@ -339,14 +118,10 @@ body.fake-fullscreen #btnMobileMenu{
 <div class="ui ui-right">
   <button id="btnFull" class="btn">
     <svg id="iconFull" class="active" viewBox="0 0 24 24">
-      <polyline points="4,9 4,4 9,4" fill="none" stroke="#fff" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round"></polyline>
-      <polyline points="20,9 20,4 15,4" fill="none" stroke="#fff" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round"></polyline>
-      <polyline points="4,15 4,20 9,20" fill="none" stroke="#fff" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round"></polyline>
-      <polyline points="20,15 20,20 15,20" fill="none" stroke="#fff" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="4,9 4,4 9,4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="20,9 20,4 15,4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="4,15 4,20 9,20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      <polyline points="20,15 20,20 15,20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
     </svg>
   </button>
 
@@ -367,30 +142,20 @@ body.fake-fullscreen #btnMobileMenu{
     </svg>
   </button>
 
-  <button id="btnLayers" class="btn">
-    <svg id="iconLayers" class="active"></svg>
-  </button>
+  <button id="btnLayers" class="btn"><svg id="iconLayers" class="active"></svg></button>
 
   <div class="speed-wrap" id="speedWrap">
     <button id="btnSpeed" class="btn">
-      <svg id="iconSpeed" class="active" viewBox="0 0 24 24">
-        <path d="M4 5l8 7-8 7V5zm9 0l8 7-8 7V5z"></path>
-      </svg>
+      <svg id="iconSpeed" class="active" viewBox="0 0 24 24"><path d="M4 5l8 7-8 7V5zm9 0l8 7-8 7V5z"></path></svg>
     </button>
-
     <div class="speed-panel" id="speedPanel">
-      <input id="speed" class="speed-slider"
-             type="range" min="0.1" max="5" step="0.05" value="0.35">
+      <input id="speed" class="speed-slider" type="range" min="0.1" max="5" step="0.05" value="0.35">
     </div>
   </div>
 </div>
 
 <button id="btnMobileMenu" class="btn mobile-menu-btn">
-  <svg id="iconMobileMenu" class="active" viewBox="0 0 24 24">
-    <circle cx="6" cy="12" r="2"></circle>
-    <circle cx="12" cy="12" r="2"></circle>
-    <circle cx="18" cy="12" r="2"></circle>
-  </svg>
+  <svg id="iconMobileMenu" class="active" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="18" cy="12" r="2"></circle></svg>
 </button>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
@@ -400,19 +165,14 @@ body.fake-fullscreen #btnMobileMenu{
 <script>
 mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
-/* redirect only */
 const GPX_URL="https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/Cwm%20Idwal%20Hike.gpx";
 
-/* camera behind walker */
-const BEARING_OFFSET_DEG = 180;
+/* FIX: use forward bearing (no 180) so camera looks along the route */
+const BEARING_OFFSET_DEG = 0;
 
-const START_ZOOM=15.7,
-      CENTER_SMOOTH=0.06,
-      MAX_TURN_RATE=4,
-      STEP_KM=0.02;
+const START_ZOOM=15.7, CENTER_SMOOTH=0.06, MAX_TURN_RATE=4, STEP_KM=0.02;
 
-let currentZoom = START_ZOOM;
-let targetZoom  = START_ZOOM;
+let currentZoom=START_ZOOM, targetZoom=START_ZOOM;
 
 function forceWhite(svg){
   svg.querySelectorAll("*").forEach(n=>{
@@ -420,7 +180,6 @@ function forceWhite(svg){
     if(n.hasAttribute("stroke")) n.setAttribute("stroke","#fff");
   });
 }
-
 async function fetchText(u){
   try{const r=await fetch(u);if(r.ok)return await r.text();}catch(e){}
   try{const r=await fetch("https://corsproxy.io/?"+encodeURIComponent(u));if(r.ok)return await r.text();}catch(e){}
@@ -430,50 +189,35 @@ function parseGpx(text){
   const xml=new DOMParser().parseFromString(text,"application/xml");
   return toGeoJSON.gpx(xml).features.find(f=>f.geometry?.type==="LineString");
 }
-function normBearing(b){
-  const x = (b % 360 + 360) % 360;
-  return x;
-}
-function bearingBehind(a,b){
-  const fwd = turf.bearing(turf.point(a), turf.point(b));
+function normBearing(b){ return (b%360+360)%360; }
+function segBearing(a,b){
+  const fwd=turf.bearing(turf.point(a),turf.point(b));
   return normBearing(fwd + BEARING_OFFSET_DEG);
 }
-function bearingAtProgressKm(pKm){
-  if(!route || !routeLen) return null;
-  const pos = turf.along(route, Math.max(0, Math.min(pKm, routeLen)), {units:"kilometers"}).geometry.coordinates;
-  const nxt = turf.along(route, Math.min(Math.max(0,pKm) + 0.01, routeLen), {units:"kilometers"}).geometry.coordinates;
-  return bearingBehind(pos, nxt);
-}
 
-/* FAST FORWARD ICON (redirect only) */
+/* FAST FORWARD ICON */
 (async()=>{
   try{
     const r=await fetch("https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/icons/fast-forward.svg");
     const t=await r.text();
     const svg=new DOMParser().parseFromString(t,"image/svg+xml").querySelector("svg");
     if(svg){
-      forceWhite(svg);
-      svg.id="iconSpeed";
-      svg.classList.add("active");
-      svg.style.width="18px";
-      svg.style.height="18px";
+      forceWhite(svg); svg.id="iconSpeed"; svg.classList.add("active");
+      svg.style.width="18px"; svg.style.height="18px";
       document.getElementById("iconSpeed").replaceWith(svg);
     }
   }catch(e){}
 })();
 
-/* LAYERS ICON (redirect only) */
+/* LAYERS ICON */
 (async()=>{
   try{
     const r=await fetch("https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/icons/layers.svg");
     const t=await r.text();
     const svg=new DOMParser().parseFromString(t,"image/svg+xml").querySelector("svg");
     if(svg){
-      forceWhite(svg);
-      svg.id="iconLayers";
-      svg.classList.add("active");
-      svg.style.width="24px";
-      svg.style.height="24px";
+      forceWhite(svg); svg.id="iconLayers"; svg.classList.add("active");
+      svg.style.width="24px"; svg.style.height="24px";
       document.getElementById("iconLayers").replaceWith(svg);
     }
   }catch(e){}
@@ -487,68 +231,56 @@ let osVisible=false;
 
 async function addArrow(){
   if(map.hasImage("arrow"))return;
-  const c=document.createElement("canvas");
-  c.width=c.height=96;
-  const ctx=c.getContext("2d");
-  ctx.translate(48,48);
-  ctx.beginPath();
-  ctx.moveTo(40,0);
-  ctx.lineTo(-24,-25);
-  ctx.lineTo(-24,25);
-  ctx.closePath();
-  ctx.strokeStyle="#EC2629";
-  ctx.fillStyle="#fff";
-  ctx.lineWidth=3;
-  ctx.stroke();
-  ctx.fill();
+  const c=document.createElement("canvas"); c.width=c.height=96;
+  const ctx=c.getContext("2d"); ctx.translate(48,48);
+  ctx.beginPath(); ctx.moveTo(40,0); ctx.lineTo(-24,-25); ctx.lineTo(-24,25); ctx.closePath();
+  ctx.strokeStyle="#EC2629"; ctx.fillStyle="#fff"; ctx.lineWidth=3; ctx.stroke(); ctx.fill();
   map.addImage("arrow",await createImageBitmap(c),{pixelRatio:2});
 }
 
 function camIcons(){
-  return{
-    follow:document.getElementById("iconCamCine"),
-    topdown:document.getElementById("iconCamBird")
-  };
+  return{ follow:document.getElementById("iconCamCine"), topdown:document.getElementById("iconCamBird") };
 }
-
 function isFullscreen(){
-  return document.fullscreenElement || document.webkitFullscreenElement ||
-         document.mozFullScreenElement || document.msFullscreenElement;
+  return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
 }
-
 function isIOS(){
-  const ua = window.navigator.userAgent || "";
-  const platform = window.navigator.platform || "";
-  const iOS = /iPad|iPhone|iPod/.test(ua);
-  const iPadOS = platform === "MacIntel" && navigator.maxTouchPoints > 1;
-  return iOS || iPadOS;
+  const ua=window.navigator.userAgent||"", platform=window.navigator.platform||"";
+  const iOS=/iPad|iPhone|iPod/.test(ua);
+  const iPadOS=platform==="MacIntel" && navigator.maxTouchPoints>1;
+  return iOS||iPadOS;
 }
-
 (function(){
-  const params = new URLSearchParams(window.location.search);
-  if(isIOS() && params.get("fs") === "1"){
+  const params=new URLSearchParams(window.location.search);
+  if(isIOS() && params.get("fs")==="1"){
     document.body.classList.add("ios-fullscreen");
-    const bf = document.getElementById("btnFull");
-    if(bf) bf.style.display = "none";
+    const bf=document.getElementById("btnFull");
+    if(bf) bf.style.display="none";
   }
 })();
 
-(async()=>{
-  const gpxText = await fetchText(GPX_URL);
-  const line = parseGpx(gpxText);
+function snapCameraToProgress(){
+  if(!map || !route || route.geometry.coordinates.length<2) return;
+  const pos=turf.along(route,progress,{units:"kilometers"}).geometry.coordinates;
+  const nxt=turf.along(route,Math.min(progress+0.01,routeLen),{units:"kilometers"}).geometry.coordinates;
+  camBearing=segBearing(pos,nxt);
+  camCenter=[pos[0],pos[1]];
+  map.jumpTo({center:camCenter,bearing:camBearing,pitch:(camMode==="topdown"?0:75),zoom:currentZoom});
+}
 
-  let initialCenter = [-4.128, 53.118];
-  let initialZoom = 13.5;
-  let initialBearing = 0;
+(async()=>{
+  const gpxText=await fetchText(GPX_URL);
+  const line=parseGpx(gpxText);
+
+  let initialCenter=[-4.128,53.118];
+  let initialZoom=13.5;
+  let initialBearing=0;
 
   if(line){
-    const b = turf.bbox(line);
-    initialCenter = [(b[0]+b[2])/2, (b[1]+b[3])/2];
-
-    const coords = line.geometry.coordinates || [];
-    if(coords.length >= 2){
-      initialBearing = bearingBehind(coords[0], coords[1]);
-    }
+    const b=turf.bbox(line);
+    initialCenter=[(b[0]+b[2])/2,(b[1]+b[3])/2];
+    const coords=line.geometry.coordinates||[];
+    if(coords.length>=2) initialBearing=segBearing(coords[0],coords[1]);
   }
 
   map=new mapboxgl.Map({
@@ -565,52 +297,27 @@ function isIOS(){
   ["mousedown","touchstart","dragstart","rotatestart","zoomstart","pitchstart"].forEach(ev=>{
     map.on(ev,e=>{
       if(!e.originalEvent) return;
-      if(playing && (camMode==="follow"||camMode==="topdown")){
-        userOverride=true;
-      }
+      if(playing && (camMode==="follow"||camMode==="topdown")) userOverride=true;
     });
   });
 
   map.on("load",async()=>{
-
     map.addSource("mapbox-dem",{type:"raster-dem",url:"mapbox://mapbox.mapbox-terrain-dem-v1"});
     map.setTerrain({source:"mapbox-dem",exaggeration:1});
-    map.addLayer({id:"sky",type:"sky",
-      paint:{"sky-type":"atmosphere","sky-atmosphere-sun-intensity":12}
-    });
+    map.addLayer({id:"sky",type:"sky",paint:{"sky-type":"atmosphere","sky-atmosphere-sun-intensity":12}});
 
     map.addSource("os-topo",{
       type:"raster",
-      tiles:[
-        "https://a.tile.opentopomap.org/{z}/{x}/{y}.png",
-        "https://b.tile.opentopomap.org/{z}/{x}/{y}.png",
-        "https://c.tile.opentopomap.org/{z}/{x}/{y}.png"
-      ],
+      tiles:["https://a.tile.opentopomap.org/{z}/{x}/{y}.png","https://b.tile.opentopomap.org/{z}/{x}/{y}.png","https://c.tile.opentopomap.org/{z}/{x}/{y}.png"],
       tileSize:256,
       maxzoom:17
     });
-    map.addLayer({
-      id:"os-topo-layer",
-      type:"raster",
-      source:"os-topo",
-      layout:{ visibility:"none" },
-      paint:{}
-    });
+    map.addLayer({id:"os-topo-layer",type:"raster",source:"os-topo",layout:{visibility:"none"},paint:{}});
 
     map.addSource("route",{type:"geojson",data:{type:"FeatureCollection",features:[]}});
-    map.addLayer({
-      id:"route-line",
-      type:"line",
-      source:"route",
-      paint:{
-        "line-color":"#EC2629",
-        "line-width":4,
-        "line-opacity":0.95
-      }
-    });
+    map.addLayer({id:"route-line",type:"line",source:"route",paint:{"line-color":"#EC2629","line-width":4,"line-opacity":0.95}});
 
     await addArrow();
-
     map.addLayer({
       id:"route-arrows",
       type:"symbol",
@@ -629,25 +336,13 @@ function isIOS(){
     });
 
     map.addSource("cursor",{type:"geojson",data:turf.point([0,0])});
-    map.addLayer({
-      id:"cursor-pt",
-      type:"circle",
-      source:"cursor",
-      paint:{
-        "circle-radius":6,
-        "circle-color":"#fff",
-        "circle-stroke-width":3,
-        "circle-stroke-color":"#EC2629"
-      }
-    });
+    map.addLayer({id:"cursor-pt",type:"circle",source:"cursor",paint:{"circle-radius":6,"circle-color":"#fff","circle-stroke-width":3,"circle-stroke-color":"#EC2629"}});
 
     if(line){
       const len=turf.length(line,{units:"kilometers"});
       const pts=[];
       for(let d=0;d<=len;d+=STEP_KM){
-        pts.push(
-          turf.along(line,Math.min(d,len),{units:"kilometers"}).geometry.coordinates
-        );
+        pts.push(turf.along(line,Math.min(d,len),{units:"kilometers"}).geometry.coordinates);
       }
       route={type:"Feature",geometry:{type:"LineString",coordinates:pts}};
       routeLen=len;
@@ -657,21 +352,13 @@ function isIOS(){
 
       map.once("idle",()=>{
         const b=turf.bbox(route);
+        const fitBearing=pts.length>=2 ? segBearing(pts[0],pts[1]) : initialBearing;
 
-        let fitBearing = initialBearing;
-        if(pts.length >= 2){
-          fitBearing = bearingBehind(pts[0], pts[1]);
-        }
+        map.fitBounds([[b[0],b[1]],[b[2],b[3]]],{padding:80,pitch:75,bearing:fitBearing,duration:0});
 
-        map.fitBounds([[b[0],b[1]],[b[2],b[3]]],{
-          padding:80,pitch:75,bearing:fitBearing,duration:0
-        });
-
-        currentZoom = START_ZOOM;
-        targetZoom  = START_ZOOM;
-
-        camBearing = fitBearing;
-        camCenter = [pts[0][0], pts[0][1]];
+        currentZoom=START_ZOOM; targetZoom=START_ZOOM;
+        camBearing=fitBearing;
+        camCenter=[pts[0][0],pts[0][1]];
       });
     }
 
@@ -684,22 +371,10 @@ document.getElementById("btnToggle").onclick=()=>{
 
   if(playing){
     userOverride=false;
+    currentZoom=START_ZOOM; targetZoom=START_ZOOM;
 
-    if(map){
-      const c = map.getCenter();
-      camCenter = [c.lng, c.lat];
-    }
-
-    const b = bearingAtProgressKm(progress);
-    if(b !== null){
-      camBearing = b;
-      if(map) map.jumpTo({ bearing: camBearing });
-    }else{
-      camBearing = map ? map.getBearing() : null;
-    }
-
-    currentZoom = START_ZOOM;
-    targetZoom  = START_ZOOM;
+    /* FIX: force correct bearing at the moment play starts */
+    snapCameraToProgress();
   }
 
   document.getElementById("iconPlay").classList.toggle("active",!playing);
@@ -708,61 +383,33 @@ document.getElementById("btnToggle").onclick=()=>{
 
 document.getElementById("btnRestart").onclick=()=>{
   if(!route || !map) return;
-
   progress=0;
-
   const startCoord=route.geometry.coordinates[0];
   map.getSource("cursor").setData(turf.point(startCoord));
-
   userOverride=false;
-  camCenter=[startCoord[0], startCoord[1]];
-
-  const coords = route.geometry.coordinates;
-  if(coords.length >= 2){
-    camBearing = bearingBehind(coords[0], coords[1]);
-    map.jumpTo({ center: camCenter, bearing: camBearing, pitch: (camMode==="topdown"?0:75), zoom: currentZoom });
-  }else{
-    camBearing = map.getBearing();
-  }
-
-  currentZoom = START_ZOOM;
-  targetZoom  = START_ZOOM;
+  currentZoom=START_ZOOM; targetZoom=START_ZOOM;
+  snapCameraToProgress();
 };
 
 document.getElementById("btnReset").onclick=()=>{
   if(!route) return;
-
   userOverride=false;
   camMode="follow";
-
   const icons=camIcons();
   Object.values(icons).forEach(i=>i.classList.remove("active"));
   icons.follow.classList.add("active");
-
-  const b = bearingAtProgressKm(progress);
-  if(b !== null) camBearing = b;
-
-  camCenter=null;
-
-  currentZoom = START_ZOOM;
-  targetZoom  = START_ZOOM;
+  currentZoom=START_ZOOM; targetZoom=START_ZOOM;
+  snapCameraToProgress();
 };
 
 document.getElementById("btnCam").onclick=()=>{
-  camMode = (camMode === "follow") ? "topdown" : "follow";
+  camMode=(camMode==="follow")?"topdown":"follow";
   const icons=camIcons();
   Object.values(icons).forEach(i=>i.classList.remove("active"));
   icons[camMode].classList.add("active");
-
   userOverride=false;
-
-  const b = bearingAtProgressKm(progress);
-  if(b !== null) camBearing = b;
-
-  camCenter=null;
-
-  currentZoom = START_ZOOM;
-  targetZoom  = START_ZOOM;
+  currentZoom=START_ZOOM; targetZoom=START_ZOOM;
+  snapCameraToProgress();
 };
 
 document.getElementById("btnLayers").onclick=()=>{
@@ -771,20 +418,16 @@ document.getElementById("btnLayers").onclick=()=>{
 };
 
 const speedWrap=document.getElementById("speedWrap");
-document.getElementById("btnSpeed").onclick=e=>{
-  e.stopPropagation();
-  speedWrap.classList.toggle("open");
-};
+document.getElementById("btnSpeed").onclick=e=>{e.stopPropagation();speedWrap.classList.toggle("open")};
 document.addEventListener("click",()=>speedWrap.classList.remove("open"));
 
 document.getElementById("btnFull").onclick=()=>{
   if(isIOS()){
-    const url = new URL(window.location.href);
+    const url=new URL(window.location.href);
     url.searchParams.set("fs","1");
-    window.open(url.toString(), "_blank");
+    window.open(url.toString(),"_blank");
     return;
   }
-
   if(!isFullscreen()){
     const el=document.documentElement;
     if(el.requestFullscreen) el.requestFullscreen();
@@ -803,24 +446,22 @@ document.getElementById("btnZoomIn").onclick=()=>{
   if(!map) return;
   const delta=0.7;
   if(playing && (camMode==="follow"||camMode==="topdown") && !userOverride){
-    targetZoom = Math.min(targetZoom + delta, 19);
+    targetZoom=Math.min(targetZoom+delta,19);
   }else{
-    const z = map.getZoom()+delta;
-    map.easeTo({ zoom:z, duration:600 });
-    currentZoom = z;
-    targetZoom  = z;
+    const z=map.getZoom()+delta;
+    map.easeTo({zoom:z,duration:600});
+    currentZoom=z; targetZoom=z;
   }
 };
 document.getElementById("btnZoomOut").onclick=()=>{
   if(!map) return;
   const delta=0.7;
   if(playing && (camMode==="follow"||camMode==="topdown") && !userOverride){
-    targetZoom = Math.max(targetZoom - delta, 4);
+    targetZoom=Math.max(targetZoom-delta,4);
   }else{
-    const z = map.getZoom()-delta;
-    map.easeTo({ zoom:z, duration:600 });
-    currentZoom = z;
-    targetZoom  = z;
+    const z=map.getZoom()-delta;
+    map.easeTo({zoom:z,duration:600});
+    currentZoom=z; targetZoom=z;
   }
 };
 
@@ -839,10 +480,9 @@ function tick(ts){
 
     map.getSource("cursor").setData(turf.point(pos));
 
-    if((camMode==="follow" || camMode==="topdown") && !userOverride){
+    if((camMode==="follow"||camMode==="topdown") && !userOverride){
       const targetCenter=pos;
-
-      const targetBearing = bearingBehind(pos, nxt);
+      const targetBearing=segBearing(pos,nxt);
       const targetPitch=camMode==="topdown"?0:75;
 
       if(camBearing===null) camBearing=targetBearing;
@@ -855,57 +495,45 @@ function tick(ts){
         camCenter[1]+(targetCenter[1]-camCenter[1])*CENTER_SMOOTH
       ];
 
-      const dz = targetZoom - currentZoom;
-      const zoomLerp = Math.min(1, 3*dt);
-      currentZoom = currentZoom + dz*zoomLerp;
+      const dz=targetZoom-currentZoom;
+      const zoomLerp=Math.min(1,3*dt);
+      currentZoom=currentZoom+dz*zoomLerp;
 
-      map.jumpTo({
-        center:camCenter,
-        bearing:camBearing,
-        pitch:targetPitch,
-        zoom:currentZoom
-      });
+      map.jumpTo({center:camCenter,bearing:camBearing,pitch:targetPitch,zoom:currentZoom});
     }
   }
 
   requestAnimationFrame(tick);
 }
 
+/* MOBILE MENU TOGGLE */
 (function(){
-  const btnMobileMenu = document.getElementById("btnMobileMenu");
-  const uiLeft = document.querySelector(".ui-left");
-  const uiRight = document.querySelector(".ui-right");
-  if(!btnMobileMenu || !uiLeft || !uiRight) return;
+  const btnMobileMenu=document.getElementById("btnMobileMenu");
+  const uiLeft=document.querySelector(".ui-left");
+  const uiRight=document.querySelector(".ui-right");
+  if(!btnMobileMenu||!uiLeft||!uiRight) return;
 
-  const isMobile = window.matchMedia("(max-width: 767px)").matches;
+  const isMobile=window.matchMedia("(max-width: 767px)").matches;
 
   function setControlsVisible(v){
-    const disp = v ? "flex" : "none";
-    uiLeft.style.display = disp;
-    uiRight.style.display = disp;
+    const disp=v?"flex":"none";
+    uiLeft.style.display=disp;
+    uiRight.style.display=disp;
   }
 
   if(isMobile){
-    const speedWrapEl  = document.getElementById("speedWrap");
-    const layersBtnEl  = document.getElementById("btnLayers");
+    const speedWrapEl=document.getElementById("speedWrap");
+    const layersBtnEl=document.getElementById("btnLayers");
+    if(layersBtnEl) uiLeft.appendChild(layersBtnEl);
+    if(speedWrapEl) uiLeft.appendChild(speedWrapEl);
 
-    if(layersBtnEl){
-      uiLeft.appendChild(layersBtnEl);
-    }
-    if(speedWrapEl){
-      uiLeft.appendChild(speedWrapEl);
-    }
-
-    btnMobileMenu.style.display = "flex";
+    btnMobileMenu.style.display="flex";
     setControlsVisible(false);
-    let visible = false;
-    btnMobileMenu.addEventListener("click",()=>{
-      visible = !visible;
-      setControlsVisible(visible);
-    });
+    let visible=false;
+    btnMobileMenu.addEventListener("click",()=>{visible=!visible;setControlsVisible(visible)});
   }else{
     setControlsVisible(true);
-    btnMobileMenu.style.display = "none";
+    btnMobileMenu.style.display="none";
   }
 })();
 </script>
