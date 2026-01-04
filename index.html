@@ -434,6 +434,16 @@ function normBearing(b){
   const x = (b % 360 + 360) % 360;
   return x;
 }
+function bearingBehind(a,b){
+  const fwd = turf.bearing(turf.point(a), turf.point(b));
+  return normBearing(fwd + BEARING_OFFSET_DEG);
+}
+function bearingAtProgressKm(pKm){
+  if(!route || !routeLen) return null;
+  const pos = turf.along(route, Math.max(0, Math.min(pKm, routeLen)), {units:"kilometers"}).geometry.coordinates;
+  const nxt = turf.along(route, Math.min(Math.max(0,pKm) + 0.01, routeLen), {units:"kilometers"}).geometry.coordinates;
+  return bearingBehind(pos, nxt);
+}
 
 /* FAST FORWARD ICON (redirect only) */
 (async()=>{
@@ -529,8 +539,6 @@ function isIOS(){
 
   let initialCenter = [-4.128, 53.118];
   let initialZoom = 13.5;
-
-  /* key: always start behind the first segment */
   let initialBearing = 0;
 
   if(line){
@@ -539,8 +547,7 @@ function isIOS(){
 
     const coords = line.geometry.coordinates || [];
     if(coords.length >= 2){
-      const fwd = turf.bearing(turf.point(coords[0]), turf.point(coords[1]));
-      initialBearing = normBearing(fwd + BEARING_OFFSET_DEG);
+      initialBearing = bearingBehind(coords[0], coords[1]);
     }
   }
 
@@ -653,8 +660,7 @@ function isIOS(){
 
         let fitBearing = initialBearing;
         if(pts.length >= 2){
-          const fwd = turf.bearing(turf.point(pts[0]), turf.point(pts[1]));
-          fitBearing = normBearing(fwd + BEARING_OFFSET_DEG);
+          fitBearing = bearingBehind(pts[0], pts[1]);
         }
 
         map.fitBounds([[b[0],b[1]],[b[2],b[3]]],{
@@ -663,7 +669,9 @@ function isIOS(){
 
         currentZoom = START_ZOOM;
         targetZoom  = START_ZOOM;
+
         camBearing = fitBearing;
+        camCenter = [pts[0][0], pts[0][1]];
       });
     }
 
@@ -673,37 +681,69 @@ function isIOS(){
 
 document.getElementById("btnToggle").onclick=()=>{
   playing=!playing;
+
   if(playing){
     userOverride=false;
-    camCenter=null;
-    camBearing=null;
+
+    if(map){
+      const c = map.getCenter();
+      camCenter = [c.lng, c.lat];
+    }
+
+    const b = bearingAtProgressKm(progress);
+    if(b !== null){
+      camBearing = b;
+      if(map) map.jumpTo({ bearing: camBearing });
+    }else{
+      camBearing = map ? map.getBearing() : null;
+    }
+
     currentZoom = START_ZOOM;
     targetZoom  = START_ZOOM;
   }
+
   document.getElementById("iconPlay").classList.toggle("active",!playing);
   document.getElementById("iconPause").classList.toggle("active",playing);
 };
 
 document.getElementById("btnRestart").onclick=()=>{
   if(!route || !map) return;
+
   progress=0;
+
   const startCoord=route.geometry.coordinates[0];
   map.getSource("cursor").setData(turf.point(startCoord));
-  camCenter=null;
-  camBearing=null;
+
+  userOverride=false;
+  camCenter=[startCoord[0], startCoord[1]];
+
+  const coords = route.geometry.coordinates;
+  if(coords.length >= 2){
+    camBearing = bearingBehind(coords[0], coords[1]);
+    map.jumpTo({ center: camCenter, bearing: camBearing, pitch: (camMode==="topdown"?0:75), zoom: currentZoom });
+  }else{
+    camBearing = map.getBearing();
+  }
+
   currentZoom = START_ZOOM;
   targetZoom  = START_ZOOM;
 };
 
 document.getElementById("btnReset").onclick=()=>{
   if(!route) return;
+
   userOverride=false;
   camMode="follow";
-  camCenter=null;
-  camBearing=null;
+
   const icons=camIcons();
   Object.values(icons).forEach(i=>i.classList.remove("active"));
   icons.follow.classList.add("active");
+
+  const b = bearingAtProgressKm(progress);
+  if(b !== null) camBearing = b;
+
+  camCenter=null;
+
   currentZoom = START_ZOOM;
   targetZoom  = START_ZOOM;
 };
@@ -715,8 +755,12 @@ document.getElementById("btnCam").onclick=()=>{
   icons[camMode].classList.add("active");
 
   userOverride=false;
+
+  const b = bearingAtProgressKm(progress);
+  if(b !== null) camBearing = b;
+
   camCenter=null;
-  camBearing=null;
+
   currentZoom = START_ZOOM;
   targetZoom  = START_ZOOM;
 };
@@ -798,9 +842,7 @@ function tick(ts){
     if((camMode==="follow" || camMode==="topdown") && !userOverride){
       const targetCenter=pos;
 
-      const fwd = turf.bearing(turf.point(pos),turf.point(nxt));
-      const targetBearing = normBearing(fwd + BEARING_OFFSET_DEG);
-
+      const targetBearing = bearingBehind(pos, nxt);
       const targetPitch=camMode==="topdown"?0:75;
 
       if(camBearing===null) camBearing=targetBearing;
