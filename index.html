@@ -167,8 +167,8 @@ mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE
 
 const GPX_URL="https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/Cwm%20Idwal%20Hike.gpx";
 
-/* FIX: use forward bearing (no 180) so camera looks along the route */
-const BEARING_OFFSET_DEG = 0;
+/* Camera behind walker looking forwards */
+const BEARING_OFFSET_DEG = 180;
 
 const START_ZOOM=15.7, CENTER_SMOOTH=0.06, MAX_TURN_RATE=4, STEP_KM=0.02;
 
@@ -372,8 +372,6 @@ document.getElementById("btnToggle").onclick=()=>{
   if(playing){
     userOverride=false;
     currentZoom=START_ZOOM; targetZoom=START_ZOOM;
-
-    /* FIX: force correct bearing at the moment play starts */
     snapCameraToProgress();
   }
 
