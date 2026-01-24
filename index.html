@@ -295,7 +295,7 @@ function snapCameraToProgress(){
   });
 
   /* MINIMUM ATTRIBUTION BACK ON (single control, no duplicates) */
-  map.addControl(new mapboxgl.AttributionControl({ compact:false }), "bottom-right");
+  map.addControl(new mapboxgl.AttributionControl({ compact:true }), "bottom-right");
 
   ["mousedown","touchstart","dragstart","rotatestart","zoomstart","pitchstart"].forEach(ev=>{
     map.on(ev,e=>{
