@@ -30,9 +30,6 @@ html,body{margin:0;height:100%;background:#000;font-family:Inter,system-ui,-appl
 /* MOBILE MENU BUTTON – base style, visibility handled in JS */
 .mobile-menu-btn{position:absolute;bottom:20px;right:20px;z-index:20;display:none}
 
-/* Hide all Mapbox branding */
-.mapboxgl-ctrl-logo,.mapboxgl-ctrl-attrib,.mapboxgl-ctrl-bottom-left,.mapboxgl-ctrl-bottom-right{display:none!important}
-
 /* Fake fullscreen hook (desktop / android) */
 body.fake-fullscreen #map{position:fixed;inset:0;z-index:1}
 body.fake-fullscreen .ui,body.fake-fullscreen #btnMobileMenu{z-index:2}
@@ -293,6 +290,9 @@ function snapCameraToProgress(){
     antialias:true,
     attributionControl:false
   });
+
+  /* MINIMUM ATTRIBUTION BACK ON (single control, no duplicates) */
+  map.addControl(new mapboxgl.AttributionControl({ compact:false }), "bottom-right");
 
   ["mousedown","touchstart","dragstart","rotatestart","zoomstart","pitchstart"].forEach(ev=>{
     map.on(ev,e=>{
