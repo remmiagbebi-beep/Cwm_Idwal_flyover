@@ -164,6 +164,9 @@ mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE
 
 const GPX_URL="https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/Cwm%20Idwal%20Hike.gpx";
 
+/* Starting view turned by 180 degrees */
+const START_VIEW_OFFSET_DEG = 180;
+
 /* Camera behind walker looking forwards */
 const BEARING_OFFSET_DEG = 180;
 
@@ -189,7 +192,7 @@ function parseGpx(text){
 function normBearing(b){ return (b%360+360)%360; }
 function segBearing(a,b){
   const fwd=turf.bearing(turf.point(a),turf.point(b));
-  return normBearing(fwd + BEARING_OFFSET_DEG);
+  return normBearing(fwd + BEARING_OFFSET_DEG + START_VIEW_OFFSET_DEG);
 }
 
 /* FAST FORWARD ICON */
