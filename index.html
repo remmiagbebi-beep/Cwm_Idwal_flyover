@@ -162,7 +162,7 @@ body.fake-fullscreen .ui,body.fake-fullscreen #btnMobileMenu{z-index:2}
 <script>
 mapboxgl.accessToken="pk.eyJ1IjoicmVtbWlhZ2JlYmkiLCJhIjoiY21odHRrYTQzMTk0bjJqcjE1b2xhZ2FraSJ9.nTCz33gX0gQt3T4A6VD0oQ";
 
-const GPX_URL="https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/Cwm%20Idwal%20Hike.gpx";
+const GPX_URL="https://raw.githubusercontent.com/The-Lost-Peak/Cwm-Idwal-Flyover/main/Cwm%20Idwal%20Hike.gpx";
 
 /* Starting view turned by 180 degrees */
 const START_VIEW_OFFSET_DEG = 180;
@@ -198,7 +198,7 @@ function segBearing(a,b){
 /* FAST FORWARD ICON */
 (async()=>{
   try{
-    const r=await fetch("https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/icons/fast-forward.svg");
+    const r=await fetch("https://raw.githubusercontent.com/The-Lost-Peak/Cwm-Idwal-Flyover/main/icons/fast-forward.svg");
     const t=await r.text();
     const svg=new DOMParser().parseFromString(t,"image/svg+xml").querySelector("svg");
     if(svg){
@@ -212,7 +212,7 @@ function segBearing(a,b){
 /* LAYERS ICON */
 (async()=>{
   try{
-    const r=await fetch("https://raw.githubusercontent.com/remmiagbebi-beep/Cwm_Idwal_flyover/main/icons/layers.svg");
+    const r=await fetch("https://raw.githubusercontent.com/The-Lost-Peak/Cwm-Idwal-Flyover/main/icons/layers.svg");
     const t=await r.text();
     const svg=new DOMParser().parseFromString(t,"image/svg+xml").querySelector("svg");
     if(svg){
